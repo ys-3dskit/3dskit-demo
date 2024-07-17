@@ -1,0 +1,19 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug 3DS on :4003",
+      "type": "gdb",
+      "request": "attach",
+      "executable": "./build/3ds/arm/debug/3dskdemo",
+		"target": "192.168.1.169:4003",
+		"remote": true,
+      "cwd": "${workspaceRoot}",
+      "valuesFormatting": "parseText",
+		"gdbpath": "/opt/devkitpro/devkitARM/bin/arm-none-eabi-gdb"
+    }
+  ]
+}
