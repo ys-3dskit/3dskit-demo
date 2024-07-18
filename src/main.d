@@ -30,6 +30,7 @@ auto loadTextureFromMem(bool t3xret = false)(C3D_Tex* tex, C3D_TexCube* cube, co
 extern(C) void main()
 {
 	gfxInitDefault();
+	gfxSet3D(true);
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
 

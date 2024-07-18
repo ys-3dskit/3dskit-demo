@@ -45,7 +45,7 @@ struct Gfx2d
 
 	private enum sineText = "Writing your code in...";
 
-	C3D_RenderTarget* target;
+	C3D_RenderTarget* targetL, targetR;
 
 	C2D_TextBuf tbuf;
 	C2D_Text textQ;
@@ -67,7 +67,8 @@ struct Gfx2d
 
 	private void setup()
 	{
-		target = C2D_CreateScreenTarget(gfxScreen_t.GFX_TOP, gfx3dSide_t.GFX_LEFT);
+		targetL = C2D_CreateScreenTarget(gfxScreen_t.GFX_TOP, gfx3dSide_t.GFX_LEFT);
+		targetR = C2D_CreateScreenTarget(gfxScreen_t.GFX_TOP, gfx3dSide_t.GFX_RIGHT);
 		C2D_ViewRotateDegrees(90);
 		C2D_ViewTranslate(0, -SCREEN_H);
 
@@ -90,17 +91,25 @@ struct Gfx2d
 		if (!cppt3x)
 			svcBreak(UserBreakType.USERBREAK_PANIC);
 
-		cppImg = C2D_Image(&cppTex, Tex3DS_GetSubTexture(cppt3x, 0)); // todo: null?
+		cppImg = C2D_Image(&cppTex, Tex3DS_GetSubTexture(cppt3x, 0));
 		Tex3DS_TextureFree(cppt3x);
 	}
 
 	void render()
 	{
+		float iod = osGet3DSliderState();
 		C2D_Prepare();
-		C2D_TargetClear(target, clrClear);
-		C3D_FrameDrawOn(target);
+		renderOn(+iod, targetL);
+		renderOn(-iod, targetR);
+		sinOset += 0.075;
+	}
+
+	private void renderOn(float iod, C3D_RenderTarget* targ)
+	{
+		C2D_TargetClear(targ, clrClear);
+		C3D_FrameDrawOn(targ);
 		// don't use scenebegin as we're also using c3d
-		C2D_SceneTarget(target);
+		C2D_SceneTarget(targ);
 
 		C2D_DrawText(&textQ, C2D_WithColor, 275, 80, 0, 4, 4, clrWhite);
 
@@ -110,22 +119,20 @@ struct Gfx2d
 			auto x = textXOsets[i];
 			auto sinInput = sinOset + M_TAU * x / textTotalWidth;
 			while (sinInput > M_TAU)
-				sinInput -= M_TAU;
+			sinInput -= M_TAU;
 
 			C2D_DrawText(
-				&texts[i], C2D_WithColor,
-				textsOset + x,
-				30 + 10 * sinf(sinInput),
-				0, 1, 1,
-				hslToRgb((sinInput / 3) * 360, 1, .7)
+			&texts[i], C2D_WithColor,
+			textsOset + (iod * 4) + x,
+			30 + 10 * sinf(sinInput),
+			0, 1, 1,
+			hslToRgb((sinInput / 3) * 360, 1, .7)
 			);
 		}
 
-		C2D_DrawImageAt(cppImg, 200-((256 * .5) / 2), 80, 0, null, 0.5, 0.5);
+		C2D_DrawImageAt(cppImg, 200 - ((256 * .5) / 2) + (iod * 6), 80, 0, null, 0.5, 0.5);
 
 		C2D_Flush();
-
-		sinOset += 0.075;
 	}
 
 	~this()
